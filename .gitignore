@@ -1,6 +1,7 @@
 
-# out dir
+# Out dirs
 /out
+/build
 
 # Gradle temp dirs
 /.gradle
