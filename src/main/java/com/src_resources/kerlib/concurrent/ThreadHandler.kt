@@ -1,22 +1,62 @@
 package com.src_resources.kerlib.concurrent
 
-abstract class ThreadHandler {
+import java.lang.NullPointerException
 
-    private val messageQueue: ThreadMessageQueue
+abstract class ThreadHandler
+        private constructor(arg_targetLooper: ThreadLooper?, arg_messageQueue: ThreadMessageQueue?) {
 
-    init {
-        val looper = ThreadLooper.getLooper()
+    private var targetLooper: ThreadLooper? = arg_targetLooper
+    private var messageQueue: ThreadMessageQueue? = arg_messageQueue
+
+    protected val looper: ThreadLooper
+            get() = targetLooper as ThreadLooper
+
+//    init {
+//        val looper = ThreadLooper.getLooperOfCurrentThread()
+//        if (looper == null) {
+//            throw IllegalThreadStateException("This thread hasn't prepared its ThreadLooper, and ThreadHandler "
+//                    + "must be initialized in a thread that has prepared its own ThreadLooper.")
+//        } else {
+//            this.targetLooper = looper
+//            messageQueue = looper.messageQueue
+//        }
+//    }
+
+    constructor() : this(null, null) {
+        val looper = ThreadLooper.getLooperOfCurrentThread()
         if (looper == null) {
             throw IllegalThreadStateException("This thread hasn't prepared its ThreadLooper, and ThreadHandler "
                     + "must be initialized in a thread that has prepared its own ThreadLooper.")
         } else {
+            this.targetLooper = looper
+            messageQueue = looper.messageQueue
+        }
+    }
+
+    constructor(targetThread: Thread) : this(null, null) {
+        val looper = ThreadLooper.getLooper(targetThread)
+        if (looper == null) {
+            throw IllegalThreadStateException("The target thread hasn't prepared its ThreadLooper, and ThreadHandler "
+                    + "must be initialized in a thread that has prepared its own ThreadLooper.")
+        } else {
+            this.targetLooper = looper
             messageQueue = looper.messageQueue
         }
     }
 
     fun obtainThreadMessage(what: Int) = ThreadMessage.obtain(this, what)
 
-    fun sendThreadMessage(msg: ThreadMessage) = messageQueue.offerThreadMessage(msg)
+    fun sendThreadMessage(msg: ThreadMessage) = messageQueue!!.offerThreadMessage(msg)
+
+    fun sendEmptyThreadMessage(what: Int) {
+        val msg = obtainThreadMessage(what)
+        msg.what = what
+        sendThreadMessage(msg)
+    }
 
     abstract fun handleThreadMessage(msg: ThreadMessage)
+
+//    private fun throwNullPointerException() {
+//        throw NullPointerException()
+//    }
 }
