@@ -9,6 +9,10 @@ import java.util.concurrent.locks.LockSupport
 import kotlin.reflect.KClass
 
 class EventBus(busName: String): Disposable {
+    companion object {
+        val DEFAULT = EventBus("default")
+    }
+
     private inner class EventPostingThreadHandler : ThreadHandler(eventPostingThread) {
         override fun handleThreadMessage(msg: ThreadMessage) {
             if (msg.obj is Event) {
