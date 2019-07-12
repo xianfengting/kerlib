@@ -56,6 +56,10 @@ abstract class ThreadHandler
 
     abstract fun handleThreadMessage(msg: ThreadMessage)
 
+    internal fun processThreadMessageHandling(msg: ThreadMessage) {
+        handleThreadMessage(msg)
+    }
+
 //    private fun throwNullPointerException() {
 //        throw NullPointerException()
 //    }

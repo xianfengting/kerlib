@@ -15,7 +15,7 @@ class ThreadLooper private constructor(val messagePollingTimeout: Long, val loop
             return looperMap[thread]
         }
 
-        fun prepare(messagePollingTimeout: Long = 60000) {
+        fun prepare(messagePollingTimeout: Long = Long.MAX_VALUE) {
             if (looperThreadLocal.get() == null) {
                 val thread = Thread.currentThread()
                 val looper = ThreadLooper(messagePollingTimeout, thread)
@@ -55,10 +55,18 @@ class ThreadLooper private constructor(val messagePollingTimeout: Long, val loop
                 // If the message is null, it means exiting the loop.
                 val message = messageQueue.pollThreadMessage(messagePollingTimeout) ?: break
                 // Pass the message to the handler.
-                message.handler.handleThreadMessage(message)
+                passThreadMessageToHandler(message)
             }
         } finally {
             isLoopRunning = false
         }
+    }
+
+    fun stopLoop() {
+        loopOwnerThread.interrupt()
+    }
+
+    private fun passThreadMessageToHandler(msg: ThreadMessage) {
+        msg.handler.processThreadMessageHandling(msg)
     }
 }
