@@ -28,6 +28,15 @@ class EventBusTest {
         fun handleEvent3(event: Event) {
             println("Event received in Subscriber class. Level high 9")
         }
+
+
+        @SubscribeEvent(priority = EventPriority.HIGH_6)
+        fun handleMyEvent1(event: MyEvent) {
+            println("MyEvent received in Subscriber class, extra=${event.extra}. Level high 6")
+        }
+    }
+    class MyEvent : Event() {
+        var extra = 0
     }
 
     @Test
@@ -48,8 +57,8 @@ class EventBusTest {
         eb.registerEventListener(el, priority = EventPriority.HIGH_7)
         val subscriber = Subscriber()
         eb.registerEventSubscriber(subscriber)
-        val e = Event()
-        eb.postEvent(e)
+        eb.postEvent(Event(), true)
+        eb.postEvent(MyEvent(), true)
     }
 
 //    @Test

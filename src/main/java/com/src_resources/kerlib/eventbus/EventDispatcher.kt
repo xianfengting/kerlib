@@ -1,5 +1,6 @@
 package com.src_resources.kerlib.eventbus
 
+import java.lang.IllegalArgumentException
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.*
@@ -96,7 +97,11 @@ class SubscriberEventDispatcher(targetEventBus: EventBus)
     override fun dispatchEvent(event: Event, priority: EventPriority) {
         eventSubscribingMethodList.forEach { subscribingMethodWrapper ->
             if (subscribingMethodWrapper.priority.equals(priority))
-                subscribingMethodWrapper.method.call(subscribingMethodWrapper.ownerSubscriber, event)
+                try {
+                    subscribingMethodWrapper.method.call(subscribingMethodWrapper.ownerSubscriber, event)
+                } catch (exception: IllegalArgumentException) {
+                    // TODO
+                }
         }
     }
 

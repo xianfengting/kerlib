@@ -3,7 +3,7 @@ package com.src_resources.kerlib.eventbus
 /**
  * Base class of events.
  */
-class Event {
+open class Event {
     /**
      * If a class that extends the Event class wants to have result,
      * it must implement this interface.
